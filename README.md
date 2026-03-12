@@ -251,8 +251,9 @@
       margin-top: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      background: rgba(15, 118, 110, 0.14);
-      border: 1px solid rgba(45, 212, 191, 0.5);
+      /* Sage + lavender theme */
+      background: linear-gradient(135deg, rgba(134, 168, 124, 0.18), rgba(181, 149, 255, 0.14));
+      border: 1px solid rgba(181, 149, 255, 0.55);
       font-size: 0.85rem;
     }
 
@@ -367,33 +368,6 @@
   </style>
 </head>
 <body>
-  <noscript>
-    <div style="padding: 20px; background: #fde68a; color: #92400e; text-align:center; font-weight:700; border-radius: 12px; margin: 16px;">
-      JavaScript is required to run this app. Please enable JavaScript in your browser.
-    </div>
-  </noscript>
-  <div id="file-warning" style="display:none; padding: 16px; background: rgba(248, 113, 113, 0.12); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.35); border-radius: 12px; margin: 16px;">
-    This page is being opened from a local file (file://). Some features like location or external requests may not work. Run a local server (e.g., <code>python -m http.server</code>) and open from <code>http://localhost:8000</code> instead for best results.
-  </div>
-  <div id="share-link" style="display:none; padding: 16px; background: rgba(34, 197, 94, 0.12); color: #a7f3d0; border: 1px solid rgba(34, 197, 94, 0.45); border-radius: 12px; margin: 16px;">
-    Share this link to open it on your phone:
-    <div style="margin: 8px 0; word-break: break-all;">
-      <div><strong>From this device:</strong> <a id="share-url" href="#" style="color: #67e8f9; text-decoration: underline;">—</a></div>
-      <div id="share-phone-row" style="margin-top: 6px; display: none;">
-        <strong>From phone:</strong> <a id="share-phone-url" href="#" style="color: #67e8f9; text-decoration: underline;">—</a>
-      </div>
-    </div>
-    <div style="display:flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
-      <button id="copy-share" class="copy-btn" type="button">Copy link</button>
-      <button id="copy-phone-link" class="copy-btn" type="button" style="display:none;">Copy phone link</button>
-      <button id="generate-standalone" class="copy-btn" type="button">Generate standalone link</button>
-    </div>
-    <div id="standalone-row" style="margin-top: 10px; display: none;">
-      <div style="font-size: 0.75rem; margin-bottom: 6px; color: #d1d5db;">Standalone link (may be very long):</div>
-      <textarea id="standalone-url" readonly style="width: 100%; height: 120px; padding: 8px; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.5); background: rgba(15, 23, 42, 0.9); color: #e5e7eb; resize: vertical;"></textarea>
-      <button id="copy-standalone" class="copy-btn" type="button" style="margin-top: 8px; display: none;">Copy standalone link</button>
-    </div>
-  </div>
   <main class="app">
     <div class="header">
       <div>
@@ -532,132 +506,6 @@
       const navColors = document.getElementById("nav-colors");
       const navSudoku = document.getElementById("nav-sudoku");
       const navRiddle = document.getElementById("nav-riddle");
-
-      const fileWarningEl = document.getElementById("file-warning");
-      const shareLinkEl = document.getElementById("share-link");
-      const shareUrlEl = document.getElementById("share-url");
-      const sharePhoneRow = document.getElementById("share-phone-row");
-      const sharePhoneUrlEl = document.getElementById("share-phone-url");
-      const copyShareBtn = document.getElementById("copy-share");
-      const copyPhoneBtn = document.getElementById("copy-phone-link");
-      const generateStandaloneBtn = document.getElementById("generate-standalone");
-      const standaloneRow = document.getElementById("standalone-row");
-      const standaloneUrlEl = document.getElementById("standalone-url");
-      const copyStandaloneBtn = document.getElementById("copy-standalone");
-
-      function isPrivateIPv4(address) {
-        return (
-          /^10\./.test(address) ||
-          /^192\.168\./.test(address) ||
-          /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(address)
-        );
-      }
-
-      function getLocalIPs(callback) {
-        const ips = new Set();
-        const pc = new RTCPeerConnection({
-          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-        });
-        pc.createDataChannel("");
-        pc.onicecandidate = (event) => {
-          if (!event.candidate) {
-            pc.close();
-            callback(Array.from(ips));
-            return;
-          }
-          const parts = event.candidate.candidate.split(" ");
-          for (const part of parts) {
-            if (/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test(part)) {
-              ips.add(part);
-            }
-          }
-        };
-        pc.createOffer()
-          .then((offer) => pc.setLocalDescription(offer))
-          .catch(() => callback([]));
-      }
-
-      if (location.protocol.startsWith("http")) {
-        fileWarningEl.style.display = "none";
-        shareLinkEl.style.display = "block";
-
-        const shareUrl = window.location.href;
-        shareUrlEl.textContent = shareUrl;
-        shareUrlEl.href = shareUrl;
-
-        copyShareBtn.addEventListener("click", () => {
-          copyToClipboard(shareUrl).then(
-            () => {
-              copyShareBtn.textContent = "Copied!";
-              setTimeout(() => (copyShareBtn.textContent = "Copy link"), 1500);
-            },
-            () => {
-              copyShareBtn.textContent = "Copy failed";
-              setTimeout(() => (copyShareBtn.textContent = "Copy link"), 2000);
-            }
-          );
-        });
-
-        function makeStandaloneUrl() {
-          const doctype = new XMLSerializer().serializeToString(document.doctype);
-          const html = doctype + document.documentElement.outerHTML;
-          return "data:text/html;charset=utf-8," + encodeURIComponent(html);
-        }
-
-        generateStandaloneBtn.addEventListener("click", () => {
-          const url = makeStandaloneUrl();
-          standaloneUrlEl.value = url;
-          standaloneRow.style.display = "block";
-          copyStandaloneBtn.style.display = "inline-flex";
-        });
-
-        copyStandaloneBtn.addEventListener("click", () => {
-          const url = standaloneUrlEl.value;
-          if (!url) return;
-          copyToClipboard(url).then(
-            () => {
-              copyStandaloneBtn.textContent = "Copied!";
-              setTimeout(() => (copyStandaloneBtn.textContent = "Copy standalone link"), 1500);
-            },
-            () => {
-              copyStandaloneBtn.textContent = "Copy failed";
-              setTimeout(() => (copyStandaloneBtn.textContent = "Copy standalone link"), 2000);
-            }
-          );
-        });
-
-        function setPhoneLink(ip) {
-          const port = window.location.port ? ":" + window.location.port : "";
-          const scheme = window.location.protocol;
-          const phoneUrl = scheme + "//" + ip + port + window.location.pathname + window.location.search + window.location.hash;
-          sharePhoneUrlEl.textContent = phoneUrl;
-          sharePhoneUrlEl.href = phoneUrl;
-          sharePhoneRow.style.display = "block";
-          copyPhoneBtn.style.display = "inline-flex";
-          copyPhoneBtn.addEventListener("click", () => {
-            copyToClipboard(phoneUrl).then(
-              () => {
-                copyPhoneBtn.textContent = "Copied!";
-                setTimeout(() => (copyPhoneBtn.textContent = "Copy phone link"), 1500);
-              },
-              () => {
-                copyPhoneBtn.textContent = "Copy failed";
-                setTimeout(() => (copyPhoneBtn.textContent = "Copy phone link"), 2000);
-              }
-            );
-          });
-        }
-
-        getLocalIPs((ips) => {
-          const privateIp = ips.find((ip) => isPrivateIPv4(ip));
-          if (privateIp) {
-            setPhoneLink(privateIp);
-          }
-        });
-      } else {
-        fileWarningEl.style.display = "block";
-        shareLinkEl.style.display = "none";
-      }
 
       let game1Complete = false;
       let game2Complete = false;
@@ -1039,38 +887,6 @@
         locationSection.style.display = "block";
       });
 
-      async function reverseGeocodeToName(lat, lng) {
-        // OpenStreetMap Nominatim reverse geocoding
-        const url =
-          "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" +
-          encodeURIComponent(lat) +
-          "&lon=" +
-          encodeURIComponent(lng);
-        const res = await fetch(url, {
-          headers: {
-            "Accept": "application/json",
-          },
-        });
-        if (!res.ok) {
-          throw new Error("Reverse geocoding failed.");
-        }
-        const data = await res.json();
-        const addr = data && data.address ? data.address : {};
-        const city =
-          addr.city ||
-          addr.town ||
-          addr.village ||
-          addr.suburb ||
-          addr.county ||
-          "";
-        const state = addr.state || "";
-        const country = addr.country || "";
-        const parts = [city, state, country].filter(Boolean);
-        if (parts.length) return parts.join(", ");
-        if (data && data.display_name) return data.display_name;
-        return "Unknown location";
-      }
-
       function copyToClipboard(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           return navigator.clipboard.writeText(text);
@@ -1099,84 +915,40 @@
           return;
         }
 
-        if (!("geolocation" in navigator)) {
-          locationStatusEl.classList.add("status--error");
-          locationStatusEl.textContent = "Geolocation is not supported in this browser.";
-          return;
-        }
+        // No geolocation required: always reveal fixed location name.
+        const name = "Sage & Lavender";
+        locationStatusEl.classList.add("status--success");
+        locationStatusEl.textContent = "Location name revealed.";
 
-        locateBtn.disabled = true;
-        locationStatusEl.textContent = "Requesting location from your browser...";
+        locationOutputEl.style.display = "block";
+        locationOutputEl.innerHTML =
+          "<div><strong>Your location:</strong></div>" +
+          "<div style='margin-top:4px;'>Sage &amp; Lavender</div>";
 
-        navigator.geolocation.getCurrentPosition(
-          function (pos) {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-
-            locationStatusEl.textContent = "Finding location name...";
-
-            reverseGeocodeToName(lat, lng)
-              .then((name) => {
-                locateBtn.disabled = false;
-                locationStatusEl.classList.add("status--success");
-                locationStatusEl.textContent = "Location name found.";
-
-                locationOutputEl.style.display = "block";
-                locationOutputEl.innerHTML =
-                  "<div><strong>Your location:</strong></div>" +
-                  "<div style='margin-top:4px;'>" +
-                  String(name).replace(/</g, "&lt;").replace(/>/g, "&gt;") +
-                  "</div>";
-
-                const copyBtn = document.createElement("button");
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "Copy location name";
+        copyBtn.className = "copy-btn";
+        copyBtn.addEventListener("click", function () {
+          copyToClipboard(name).then(
+            function () {
+              copyBtn.textContent = "Copied!";
+              setTimeout(function () {
                 copyBtn.textContent = "Copy location name";
-                copyBtn.className = "copy-btn";
-                copyBtn.addEventListener("click", function () {
-                  copyToClipboard(name).then(
-                    function () {
-                      copyBtn.textContent = "Copied!";
-                      setTimeout(function () {
-                        copyBtn.textContent = "Copy location name";
-                      }, 1500);
-                    },
-                    function () {
-                      copyBtn.textContent = "Copy failed";
-                      setTimeout(function () {
-                        copyBtn.textContent = "Copy location name";
-                      }, 2000);
-                    }
-                  );
-                });
-                locationOutputEl.appendChild(copyBtn);
-              })
-              .catch(() => {
-                locateBtn.disabled = false;
-                locationStatusEl.classList.add("status--error");
-                locationStatusEl.textContent =
-                  "Got coordinates, but couldn’t find a location name. Try again.";
-              });
-          },
-          function (err) {
-            locateBtn.disabled = false;
-            locationStatusEl.classList.add("status--error");
-            if (err.code === err.PERMISSION_DENIED) {
-              locationStatusEl.textContent = "Permission denied. Allow location access to generate the link.";
-            } else if (err.code === err.POSITION_UNAVAILABLE) {
-              locationStatusEl.textContent = "Location unavailable. Try again or check your connection.";
-            } else if (err.code === err.TIMEOUT) {
-              locationStatusEl.textContent = "Location request timed out. Try again.";
-            } else {
-              locationStatusEl.textContent = "Error getting location.";
+              }, 1500);
+            },
+            function () {
+              copyBtn.textContent = "Copy failed";
+              setTimeout(function () {
+                copyBtn.textContent = "Copy location name";
+              }, 2000);
             }
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0,
-          }
-        );
+          );
+        });
+        locationOutputEl.appendChild(copyBtn);
       });
     })();
   </script>
 </body>
 </html>
+
+
