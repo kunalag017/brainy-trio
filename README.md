@@ -390,7 +390,7 @@
       </button>
       <button class="nav-btn" data-game="riddle" id="nav-riddle" style="display:none;">
         <span>Bollywood Match</span>
-        <span>Easy recent movies</span>
+        <span>3 levels · tougher</span>
       </button>
     </nav>
 
@@ -428,52 +428,20 @@
     <section class="game-panel" id="game-riddle" style="display:none;">
       <h2>Game 3 · Bollywood Movie Match</h2>
       <p>
-        Match each recent movie to its lead actor. When all matches are correct, you’ll unlock your location name.
+        Match each recent movie to its lead actor. Clear all three levels to unlock your location name.
       </p>
 
-      <div style="padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.08);">
-        <div style="font-weight: 700; letter-spacing: 0.02em;">Recent Bollywood</div>
+      <div style="padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.08); margin-bottom: 8px;">
+        <div style="font-weight: 700; letter-spacing: 0.02em; display:flex; justify-content:space-between; align-items:center;">
+          <span>Recent Bollywood</span>
+          <span id="bolly-level-indicator" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:#fecaca;">Level 1 of 3</span>
+        </div>
         <div style="margin-top: 4px; color: #e5e7eb; font-size: 0.9rem;">
-          Quick and easy: pick the correct lead actor for each movie.
+          Choose the correct lead actor for every movie in this level.
         </div>
       </div>
 
-      <div style="margin-top: 10px;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items:center;">
-          <div style="font-weight:700; color:#e5e7eb;">Movie</div>
-          <div style="font-weight:700; color:#e5e7eb;">Lead actor</div>
-
-          <div style="padding:10px; border-radius:12px; background: rgba(59, 130, 246, 0.14); border: 1px solid rgba(59, 130, 246, 0.45);">
-            Jawan (2023)
-          </div>
-          <select id="match-1" style="padding:10px; border-radius:12px; border:1px solid rgba(148,163,184,0.45); background: rgba(15,23,42,0.95); color:#e5e7eb;">
-            <option value="">Choose...</option>
-            <option value="srk">Shah Rukh Khan</option>
-            <option value="ranbir">Ranbir Kapoor</option>
-            <option value="vikrant">Vikrant Massey</option>
-          </select>
-
-          <div style="padding:10px; border-radius:12px; background: rgba(34, 197, 94, 0.14); border: 1px solid rgba(34, 197, 94, 0.45);">
-            Animal (2023)
-          </div>
-          <select id="match-2" style="padding:10px; border-radius:12px; border:1px solid rgba(148,163,184,0.45); background: rgba(15,23,42,0.95); color:#e5e7eb;">
-            <option value="">Choose...</option>
-            <option value="ranbir">Ranbir Kapoor</option>
-            <option value="vikrant">Vikrant Massey</option>
-            <option value="srk">Shah Rukh Khan</option>
-          </select>
-
-          <div style="padding:10px; border-radius:12px; background: rgba(168, 85, 247, 0.14); border: 1px solid rgba(168, 85, 247, 0.45);">
-            12th Fail (2023)
-          </div>
-          <select id="match-3" style="padding:10px; border-radius:12px; border:1px solid rgba(148,163,184,0.45); background: rgba(15,23,42,0.95); color:#e5e7eb;">
-            <option value="">Choose...</option>
-            <option value="vikrant">Vikrant Massey</option>
-            <option value="srk">Shah Rukh Khan</option>
-            <option value="ranbir">Ranbir Kapoor</option>
-          </select>
-        </div>
-      </div>
+      <div id="bolly-rows" style="margin-top: 4px;"></div>
 
       <div class="actions">
         <span id="riddle-status" class="status"></span>
@@ -646,37 +614,49 @@
         tubes.forEach((tube, idx) => {
           const tubeEl = document.createElement("button");
           tubeEl.type = "button";
-          tubeEl.style.width = "86px";
+          tubeEl.style.width = "70px";
           tubeEl.style.height = "190px";
-          tubeEl.style.padding = "10px 10px 12px";
-          tubeEl.style.borderRadius = "24px";
+          tubeEl.style.padding = "10px 6px 12px";
+          tubeEl.style.borderRadius = "18px";
           tubeEl.style.border =
             idx === selectedTubeIndex
-              ? "2px solid rgba(250, 204, 21, 0.9)"
-              : "2px solid rgba(148, 163, 184, 0.7)";
-          tubeEl.style.background = "rgba(15, 23, 42, 0.9)";
-          tubeEl.style.display = "flex";
-          // Top of tube is visually at the top; stack segments from top to bottom.
-          tubeEl.style.flexDirection = "column";
-          tubeEl.style.justifyContent = "flex-end";
-          tubeEl.style.gap = "4px";
+              ? "3px solid rgba(255, 255, 255, 0.95)"
+              : "3px solid rgba(248, 250, 252, 0.8)";
+          tubeEl.style.background =
+            "rgba(15, 23, 42, 0.4)";
+          tubeEl.style.boxShadow = "0 0 10px rgba(15,23,42,0.85)";
+          // Inner glass area
+          const inner = document.createElement("div");
+          inner.style.flex = "1";
+          inner.style.margin = "6px 4px 0 4px";
+          inner.style.borderRadius = "14px";
+          inner.style.border = "2px solid rgba(15, 23, 42, 0.9)";
+          inner.style.background = "rgba(15,23,42,0.95)";
+          inner.style.display = "flex";
+          inner.style.flexDirection = "column";
+          inner.style.justifyContent = "flex-end";
+          inner.style.gap = "3px";
 
           for (let s = 0; s < TUBE_CAPACITY; s++) {
             const liquidIndex = tube.length - 1 - s;
             const color = liquidIndex >= 0 ? tube[liquidIndex] : null;
             const seg = document.createElement("div");
-            seg.style.height = "30px";
+            seg.style.height = "28px";
             seg.style.borderRadius = "10px";
-            // Very clear, bright colours inside each tube segment
-            seg.style.background = color ? color : "rgba(15, 23, 42, 0.5)";
+            // Clear, bright colours inside each tube segment (like the reference image)
+            seg.style.background = color
+              ? color
+              : "rgba(15, 23, 42, 0.1)";
             seg.style.border = color
-              ? "2px solid rgba(15, 23, 42, 0.95)"
-              : "1px dashed rgba(51, 65, 85, 0.8)";
+              ? "1px solid rgba(15, 23, 42, 0.9)"
+              : "1px dashed rgba(148, 163, 184, 0.5)";
             seg.style.boxShadow = color
-              ? "0 0 10px " + color
-              : "inset 0 0 4px rgba(15, 23, 42, 0.9)";
-            tubeEl.appendChild(seg);
+              ? "0 0 6px " + color
+              : "inset 0 0 3px rgba(15, 23, 42, 0.9)";
+            inner.appendChild(seg);
           }
+
+          tubeEl.appendChild(inner);
 
           tubeEl.addEventListener("click", () => {
             waterStatusEl.classList.remove("status--error", "status--success");
@@ -840,7 +820,7 @@
 
         sudokuStatusEl.classList.add("status--success");
         sudokuStatusEl.textContent =
-          "Perfect Sudoku! You solved this level. The Brainy Riddle is now unlocked.";
+          "Perfect Sudoku! You solved this level. Bollywood Match is now unlocked.";
         game2Complete = true;
         sudokuCheckBtn.disabled = true;
         // Reveal Riddle in the navigation
@@ -849,40 +829,175 @@
 
       buildSudoku();
 
-      // Game 3: Cartoon match quest + Location name
+      // Game 3: Bollywood match quest + Location name
       const riddleStatusEl = document.getElementById("riddle-status");
       const riddleCheckBtn = document.getElementById("riddle-check-btn");
       const locationSection = document.getElementById("location-section");
       const locateBtn = document.getElementById("locate-btn");
       const locationStatusEl = document.getElementById("location-status");
       const locationOutputEl = document.getElementById("location-output");
-      const match1El = document.getElementById("match-1");
-      const match2El = document.getElementById("match-2");
-      const match3El = document.getElementById("match-3");
+      const bollyRowsEl = document.getElementById("bolly-rows");
+      const bollyLevelIndicator = document.getElementById("bolly-level-indicator");
+
+      const BOLLYWOOD_LEVELS = [
+        {
+          movies: [
+            { title: "Jawan (2023)", correct: "srk" },
+            { title: "Animal (2023)", correct: "ranbir" },
+            { title: "12th Fail (2023)", correct: "vikrant" },
+          ],
+          options: [
+            { value: "srk", label: "Shah Rukh Khan" },
+            { value: "ranbir", label: "Ranbir Kapoor" },
+            { value: "vikrant", label: "Vikrant Massey" },
+            { value: "akshay", label: "Akshay Kumar" },
+            { value: "varun", label: "Varun Dhawan" },
+          ],
+        },
+        {
+          movies: [
+            { title: "Pathaan (2023)", correct: "srk" },
+            { title: "Rocky Aur Rani Kii Prem Kahaani (2023)", correct: "ranveer" },
+            { title: "Tu Jhoothi Main Makkaar (2023)", correct: "ranbir" },
+          ],
+          options: [
+            { value: "srk", label: "Shah Rukh Khan" },
+            { value: "ranveer", label: "Ranveer Singh" },
+            { value: "ranbir", label: "Ranbir Kapoor" },
+            { value: "kartik", label: "Kartik Aaryan" },
+            { value: "ayushmann", label: "Ayushmann Khurrana" },
+          ],
+        },
+        {
+          movies: [
+            { title: "Gadar 2 (2023)", correct: "sunny" },
+            { title: "Zara Hatke Zara Bachke (2023)", correct: "vicky" },
+            { title: "Bhediya (2022)", correct: "varun" },
+          ],
+          options: [
+            { value: "sunny", label: "Sunny Deol" },
+            { value: "vicky", label: "Vicky Kaushal" },
+            { value: "varun", label: "Varun Dhawan" },
+            { value: "vikrant", label: "Vikrant Massey" },
+            { value: "ranbir", label: "Ranbir Kapoor" },
+          ],
+        },
+      ];
+
+      let bollyLevelIndex = 0;
+
+      function renderBollywoodLevel() {
+        const level = BOLLYWOOD_LEVELS[bollyLevelIndex];
+        if (!level) return;
+
+        bollyLevelIndicator.textContent =
+          "Level " + (bollyLevelIndex + 1) + " of " + BOLLYWOOD_LEVELS.length;
+        riddleStatusEl.classList.remove("status--error", "status--success");
+        riddleStatusEl.textContent = "";
+
+        bollyRowsEl.innerHTML = "";
+        const grid = document.createElement("div");
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = "1fr 1fr";
+        grid.style.gap = "10px";
+        grid.style.alignItems = "center";
+
+        const headerMovie = document.createElement("div");
+        headerMovie.textContent = "Movie";
+        headerMovie.style.fontWeight = "700";
+        headerMovie.style.color = "#e5e7eb";
+        const headerActor = document.createElement("div");
+        headerActor.textContent = "Lead actor";
+        headerActor.style.fontWeight = "700";
+        headerActor.style.color = "#e5e7eb";
+        grid.appendChild(headerMovie);
+        grid.appendChild(headerActor);
+
+        level.movies.forEach((movie, idx) => {
+          const movieDiv = document.createElement("div");
+          movieDiv.textContent = movie.title;
+          movieDiv.style.padding = "10px";
+          movieDiv.style.borderRadius = "12px";
+          movieDiv.style.background = "rgba(59, 130, 246, 0.14)";
+          movieDiv.style.border = "1px solid rgba(59, 130, 246, 0.45)";
+
+          const select = document.createElement("select");
+          select.className = "bolly-select";
+          select.dataset.correct = movie.correct;
+          select.style.padding = "10px";
+          select.style.borderRadius = "12px";
+          select.style.border = "1px solid rgba(148,163,184,0.45)";
+          select.style.background = "rgba(15,23,42,0.95)";
+          select.style.color = "#e5e7eb";
+
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = "Choose...";
+          select.appendChild(placeholder);
+
+          level.options.forEach((opt) => {
+            const option = document.createElement("option");
+            option.value = opt.value;
+            option.textContent = opt.label;
+            select.appendChild(option);
+          });
+
+          grid.appendChild(movieDiv);
+          grid.appendChild(select);
+        });
+
+        bollyRowsEl.appendChild(grid);
+      }
 
       riddleCheckBtn.addEventListener("click", function () {
         riddleStatusEl.classList.remove("status--error", "status--success");
         riddleStatusEl.textContent = "";
 
-        const v1 = match1El ? match1El.value : "";
-        const v2 = match2El ? match2El.value : "";
-        const v3 = match3El ? match3El.value : "";
-        if (!v1 || !v2 || !v3) {
+        const selects = Array.from(
+          document.querySelectorAll(".bolly-select")
+        );
+
+        if (!selects.length) {
           riddleStatusEl.classList.add("status--error");
-          riddleStatusEl.textContent = "Choose an item for every character.";
+          riddleStatusEl.textContent = "Something went wrong loading this level.";
           return;
         }
 
-        const correct = v1 === "srk" && v2 === "ranbir" && v3 === "vikrant";
-        if (!correct) {
+        for (const sel of selects) {
+          if (!sel.value) {
+            riddleStatusEl.classList.add("status--error");
+            riddleStatusEl.textContent = "Choose an actor for every movie.";
+            return;
+          }
+        }
+
+        let allCorrect = true;
+        for (const sel of selects) {
+          if (sel.value !== sel.dataset.correct) {
+            allCorrect = false;
+            break;
+          }
+        }
+
+        if (!allCorrect) {
           riddleStatusEl.classList.add("status--error");
-          riddleStatusEl.textContent = "Not quite. Try different matches!";
+          riddleStatusEl.textContent = "Not quite. Check the matches and try again!";
+          return;
+        }
+
+        if (bollyLevelIndex < BOLLYWOOD_LEVELS.length - 1) {
+          bollyLevelIndex += 1;
+          riddleStatusEl.classList.add("status--success");
+          riddleStatusEl.textContent = "Level cleared! Loading the next set of movies...";
+          setTimeout(() => {
+            renderBollywoodLevel();
+          }, 800);
           return;
         }
 
         riddleStatusEl.classList.add("status--success");
         riddleStatusEl.textContent =
-          "Perfect! You’ve completed all three games. Now you can reveal your location name.";
+          "Amazing! You’ve completed all Bollywood levels. Now you can reveal your location name.";
         game3Complete = true;
         locationSection.style.display = "block";
       });
@@ -916,14 +1031,14 @@
         }
 
         // No geolocation required: always reveal fixed location name.
-        const name = "Sage & Lavender";
+        const name = "Sage & Lavender, Chennai";
         locationStatusEl.classList.add("status--success");
         locationStatusEl.textContent = "Location name revealed.";
 
         locationOutputEl.style.display = "block";
         locationOutputEl.innerHTML =
           "<div><strong>Your location:</strong></div>" +
-          "<div style='margin-top:4px;'>Sage &amp; Lavender</div>";
+          "<div style='margin-top:4px;'>Sage &amp; Lavender, Chennai</div>";
 
         const copyBtn = document.createElement("button");
         copyBtn.textContent = "Copy location name";
@@ -946,9 +1061,14 @@
         });
         locationOutputEl.appendChild(copyBtn);
       });
+
+      // Initialise first Bollywood level
+      renderBollywoodLevel();
     })();
   </script>
 </body>
 </html>
+
+
 
 
