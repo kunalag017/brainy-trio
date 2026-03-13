@@ -692,9 +692,11 @@
               waterStatusEl.classList.add("status--success");
               if (waterLevelIndex === WATER_LEVELS.length - 1) {
                 waterStatusEl.textContent =
-                  "Level complete! You finished Liquid Sort. Sudoku has been unlocked.";
+                  "Level complete! You finished Liquid Sort. Sudoku is opening…";
                 game1Complete = true;
                 navSudoku.style.display = "flex";
+                // Automatically switch to Sudoku game
+                navSudoku.click();
               } else {
                 waterStatusEl.textContent = "Level complete! Moving to next level...";
                 setTimeout(() => loadWaterLevel(waterLevelIndex + 1), 900);
@@ -820,11 +822,13 @@
 
         sudokuStatusEl.classList.add("status--success");
         sudokuStatusEl.textContent =
-          "Perfect Sudoku! You solved this level. Bollywood Match is now unlocked.";
+          "Perfect Sudoku! You solved this level. Opening Bollywood Match…";
         game2Complete = true;
         sudokuCheckBtn.disabled = true;
         // Reveal Riddle in the navigation
         navRiddle.style.display = "flex";
+        // Automatically switch to Bollywood Match game
+        navRiddle.click();
       });
 
       buildSudoku();
@@ -840,25 +844,29 @@
       const bollyLevelIndicator = document.getElementById("bolly-level-indicator");
 
       const BOLLYWOOD_LEVELS = [
+        // Level 1 – warm‑up, still non‑trivial
         {
           movies: [
             { title: "Jawan (2023)", correct: "srk" },
             { title: "Animal (2023)", correct: "ranbir" },
             { title: "12th Fail (2023)", correct: "vikrant" },
+            { title: "Bhool Bhulaiyaa 2 (2022)", correct: "kartik" },
           ],
           options: [
             { value: "srk", label: "Shah Rukh Khan" },
             { value: "ranbir", label: "Ranbir Kapoor" },
             { value: "vikrant", label: "Vikrant Massey" },
+            { value: "kartik", label: "Kartik Aaryan" },
             { value: "akshay", label: "Akshay Kumar" },
-            { value: "varun", label: "Varun Dhawan" },
           ],
         },
+        // Level 2 – more overlap between choices
         {
           movies: [
             { title: "Pathaan (2023)", correct: "srk" },
             { title: "Rocky Aur Rani Kii Prem Kahaani (2023)", correct: "ranveer" },
             { title: "Tu Jhoothi Main Makkaar (2023)", correct: "ranbir" },
+            { title: "Satyaprem Ki Katha (2023)", correct: "kartik" },
           ],
           options: [
             { value: "srk", label: "Shah Rukh Khan" },
@@ -868,18 +876,20 @@
             { value: "ayushmann", label: "Ayushmann Khurrana" },
           ],
         },
+        // Level 3 – trickier mix, less obvious
         {
           movies: [
             { title: "Gadar 2 (2023)", correct: "sunny" },
             { title: "Zara Hatke Zara Bachke (2023)", correct: "vicky" },
             { title: "Bhediya (2022)", correct: "varun" },
+            { title: "Andhadhun (2018)", correct: "ayushmann" },
           ],
           options: [
             { value: "sunny", label: "Sunny Deol" },
             { value: "vicky", label: "Vicky Kaushal" },
             { value: "varun", label: "Varun Dhawan" },
             { value: "vikrant", label: "Vikrant Massey" },
-            { value: "ranbir", label: "Ranbir Kapoor" },
+            { value: "ayushmann", label: "Ayushmann Khurrana" },
           ],
         },
       ];
@@ -1068,6 +1078,7 @@
   </script>
 </body>
 </html>
+
 
 
 
