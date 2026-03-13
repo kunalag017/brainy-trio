@@ -844,52 +844,52 @@
       const bollyLevelIndicator = document.getElementById("bolly-level-indicator");
 
       const BOLLYWOOD_LEVELS = [
-        // Level 1 – warm‑up, still non‑trivial
+        // Level 1 – mix of popular and slightly older
         {
           movies: [
-            { title: "Jawan (2023)", correct: "srk" },
-            { title: "Animal (2023)", correct: "ranbir" },
-            { title: "12th Fail (2023)", correct: "vikrant" },
-            { title: "Bhool Bhulaiyaa 2 (2022)", correct: "kartik" },
+            { title: "Sholay (1975)", correct: "amitabh" },
+            { title: "Dilwale Dulhania Le Jayenge (1995)", correct: "srk" },
+            { title: "Lagaan (2001)", correct: "aamir" },
+            { title: "3 Idiots (2009)", correct: "aamir" },
           ],
           options: [
+            { value: "amitabh", label: "Amitabh Bachchan" },
+            { value: "dharmendra", label: "Dharmendra" },
             { value: "srk", label: "Shah Rukh Khan" },
-            { value: "ranbir", label: "Ranbir Kapoor" },
-            { value: "vikrant", label: "Vikrant Massey" },
-            { value: "kartik", label: "Kartik Aaryan" },
-            { value: "akshay", label: "Akshay Kumar" },
+            { value: "aamir", label: "Aamir Khan" },
+            { value: "salman", label: "Salman Khan" },
           ],
         },
-        // Level 2 – more overlap between choices
+        // Level 2 – 90s / 2000s with overlapping stars
         {
           movies: [
-            { title: "Pathaan (2023)", correct: "srk" },
-            { title: "Rocky Aur Rani Kii Prem Kahaani (2023)", correct: "ranveer" },
-            { title: "Tu Jhoothi Main Makkaar (2023)", correct: "ranbir" },
-            { title: "Satyaprem Ki Katha (2023)", correct: "kartik" },
+            { title: "Andaz Apna Apna (1994)", correct: "aamir" },
+            { title: "Kabhi Khushi Kabhie Gham (2001)", correct: "srk" },
+            { title: "Hum Dil De Chuke Sanam (1999)", correct: "salman" },
+            { title: "Barfi! (2012)", correct: "ranbir" },
           ],
           options: [
+            { value: "aamir", label: "Aamir Khan" },
             { value: "srk", label: "Shah Rukh Khan" },
-            { value: "ranveer", label: "Ranveer Singh" },
+            { value: "salman", label: "Salman Khan" },
+            { value: "hrithik", label: "Hrithik Roshan" },
             { value: "ranbir", label: "Ranbir Kapoor" },
-            { value: "kartik", label: "Kartik Aaryan" },
-            { value: "ayushmann", label: "Ayushmann Khurrana" },
           ],
         },
-        // Level 3 – trickier mix, less obvious
+        // Level 3 – more recent + critically acclaimed, harder to guess
         {
           movies: [
-            { title: "Gadar 2 (2023)", correct: "sunny" },
-            { title: "Zara Hatke Zara Bachke (2023)", correct: "vicky" },
-            { title: "Bhediya (2022)", correct: "varun" },
+            { title: "Kahaani (2012)", correct: "vidya" },
+            { title: "Masaan (2015)", correct: "vicky" },
             { title: "Andhadhun (2018)", correct: "ayushmann" },
+            { title: "Haider (2014)", correct: "shahid" },
           ],
           options: [
-            { value: "sunny", label: "Sunny Deol" },
+            { value: "vidya", label: "Vidya Balan" },
             { value: "vicky", label: "Vicky Kaushal" },
-            { value: "varun", label: "Varun Dhawan" },
-            { value: "vikrant", label: "Vikrant Massey" },
             { value: "ayushmann", label: "Ayushmann Khurrana" },
+            { value: "rajkummar", label: "Rajkummar Rao" },
+            { value: "shahid", label: "Shahid Kapoor" },
           ],
         },
       ];
@@ -1078,8 +1078,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
