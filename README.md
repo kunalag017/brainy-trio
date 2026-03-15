@@ -3,398 +3,695 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Brainy Trio: three mini games — Liquid Sort, Sudoku, Bollywood Match. Complete all three to reveal your final location." />
   <title>Brainy Trio · Puzzle Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* ===== Design system ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      /* Colors – dark + teal & amber */
+      --bg: #0c0f14;
+      --bg-card: #13171e;
+      --bg-elevated: #1a1f28;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #f0f2f5;
+      --text-muted: #8b92a0;
+      --accent: #14b8a6;
+      --accent-strong: #2dd4bf;
+      --accent-amber: #f59e0b;
+      --accent-amber-strong: #fbbf24;
+      --accent-muted: rgba(20, 184, 166, 0.15);
+      --success: #22c55e;
+      --error: #ef4444;
+      --focus-ring: 0 0 0 3px rgba(20, 184, 166, 0.5);
+      /* Spacing (4px base) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      /* Typography */
+      --font-display: "Syne", system-ui, sans-serif;
+      --font-sans: "DM Sans", system-ui, sans-serif;
+      --text-xs: 0.7rem;
+      --text-sm: 0.8rem;
+      --text-base: 0.9rem;
+      --text-lg: 1rem;
+      --text-xl: 1.15rem;
+      --text-2xl: 1.75rem;
+      --leading-tight: 1.25;
+      --leading-normal: 1.5;
+      /* Radius & motion */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --duration: 0.2s;
+      --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      /* 3D depth */
+      --shadow-3d-sm: 0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2);
+      --shadow-3d-md: 0 8px 16px rgba(0,0,0,0.4), 0 16px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.1);
+      --shadow-3d-lg: 0 20px 40px rgba(0,0,0,0.5), 0 40px 80px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.15);
+      --shadow-inset: inset 0 2px 6px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.2);
+      --shadow-raised: 0 6px 0 rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.35);
+      --highlight-top: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 50%);
     }
 
+    html { scroll-behavior: smooth; }
     body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      background: radial-gradient(circle at top, #20294f, #050816);
-      color: #f9fafb;
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      background:
+        radial-gradient(ellipse 100% 100% at 50% 0%, #151a22 0%, var(--bg) 50%),
+        var(--bg);
+      color: var(--text);
+      padding: 0 var(--space-4) var(--space-8);
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+      perspective: 1200px;
     }
 
-    .app {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(15, 23, 42, 0.9);
-      border-radius: 20px;
-      padding: 20px 18px 18px;
+    /* Focus visible for accessibility */
+    button:focus-visible,
+    .nav-btn:focus-visible,
+    .option:focus-visible,
+    .sudoku-cell:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+    .nav-btn { outline: none; }
+
+    /* ===== Layout ===== */
+    .app-shell {
+      max-width: 680px;
+      margin: 0 auto;
+      transform-style: preserve-3d;
+      overflow: visible;
+    }
+
+    /* ===== Hero – 3D recessed panel ===== */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 4rem var(--space-5) 3.5rem;
+      background:
+        var(--highlight-top),
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(20, 184, 166, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 80% 50%, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
       box-shadow:
-        0 20px 30px rgba(15, 23, 42, 0.65),
-        0 0 0 1px rgba(148, 163, 184, 0.12);
-      backdrop-filter: blur(18px);
+        var(--shadow-inset),
+        0 4px 20px rgba(0,0,0,0.3);
+      overflow: hidden;
+      transform: translateZ(0);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.15) 100%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .hero-inner {
+      position: relative;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-3);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+    .hero-title .hero-title__highlight {
+      display: block;
+      color: var(--accent-strong);
+      margin-top: 0.35rem;
+      font-weight: 700;
+    }
+    .hero-subtitle {
+      margin-top: var(--space-4);
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 28rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-cta-row {
+      margin-top: var(--space-6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      box-shadow: var(--shadow-3d-sm), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .hero-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--accent-amber);
+      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ===== App card – 3D floating panel ===== */
+    .app {
+      margin-top: var(--space-6);
+      padding: var(--space-6) var(--space-5) var(--space-5);
+      background:
+        var(--highlight-top),
+        var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 1.5rem;
+      box-shadow: var(--shadow-3d-lg);
+      position: relative;
+      z-index: 1;
+      transform: translateZ(20px);
+      transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+      overflow: visible;
+    }
+    .app:hover {
+      transform: translateZ(24px) rotateX(1deg);
+      box-shadow:
+        0 24px 48px rgba(0,0,0,0.5),
+        0 48px 96px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(0,0,0,0.2),
+        0 0 60px rgba(20, 184, 166, 0.08);
+    }
+    .app__header { margin-bottom: var(--space-2); }
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-amber);
+      padding: var(--space-1) var(--space-3);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-full);
+      background: rgba(245, 158, 11, 0.1);
+      box-shadow: var(--shadow-3d-sm), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .app__title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-top: var(--space-2);
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: var(--space-2) 0 var(--space-4);
+      line-height: 1.5;
+    }
+
+    /* ===== Nav – 3D tab bar ===== */
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      padding: var(--space-2);
+      background: rgba(0,0,0,0.25);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-inset);
+    }
+    .nav-btn {
+      padding: var(--space-3) var(--space-4);
+      border: none;
+      border-radius: var(--radius-sm);
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: color var(--duration) var(--ease),
+                  border-color var(--duration) var(--ease),
+                  transform var(--duration) var(--ease),
+                  box-shadow var(--duration) var(--ease);
+      text-align: left;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+    .nav-btn span:first-child { font-weight: 600; }
+    .nav-btn span:last-child { font-size: 0.7rem; color: var(--text-muted); opacity: 0.8; }
+    .nav-btn:hover {
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .nav-btn--active {
+      color: var(--accent-strong);
+      background: rgba(20, 184, 166, 0.12);
+      border-bottom-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+    }
+    .nav-btn--active span:last-child { color: var(--accent); opacity: 0.9; }
+
+    /* ===== Game panels – 3D recessed ===== */
+    .game-panel {
+      padding: var(--space-5);
+      border-radius: 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-inset), 0 4px 12px rgba(0,0,0,0.2);
+      overflow: visible;
+    }
+    .game-panel h2 {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .game-panel > p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: var(--space-3);
+      line-height: var(--leading-normal);
+    }
+    .game-panel__rule {
+      margin-top: var(--space-3);
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .water-tubes-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+      justify-content: center;
+    }
+    .water-tube {
+      box-shadow:
+        0 6px 0 rgba(0,0,0,0.25),
+        0 8px 24px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .water-tube:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 9px 0 rgba(0,0,0,0.2),
+        0 12px 28px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .water-tube:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 2px 0 rgba(0,0,0,0.3),
+        0 4px 12px rgba(0,0,0,0.35),
+        inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .level-badges { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+    .level-badge {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px dashed var(--border);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
     }
 
-    .header {
+    /* Bollywood header block */
+    .bolly-header {
+      padding: var(--space-3) var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      background: var(--accent-muted);
+      margin-bottom: var(--space-2);
+      box-shadow: var(--shadow-3d-sm), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .bolly-header__row {
+      font-weight: 700;
+      letter-spacing: 0.02em;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
     }
-
-    .title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    .badge {
-      font-size: 0.7rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.12);
-      color: #22d3ee;
-      border: 1px solid rgba(45, 212, 191, 0.35);
+    .bolly-header__indicator {
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.08em;
+      color: var(--accent-strong);
     }
+    .bolly-header__subtitle {
+      margin-top: var(--space-1);
+      color: var(--text);
+      font-size: var(--text-base);
+    }
+    .bolly-rows { margin-top: var(--space-1); }
 
-    .subtitle {
-      font-size: 0.9rem;
-      color: #9ca3af;
-      margin-bottom: 18px;
+    /* Location section */
+    .location-section {
+      margin-top: var(--space-5);
     }
-
-    .nav {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .nav-btn {
-      border-radius: 999px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      background: rgba(15, 23, 42, 0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      color: #e5e7eb;
-    }
-
-    .nav-btn span:first-child {
-      font-weight: 600;
-      font-size: 0.78rem;
-    }
-
-    .nav-btn span:last-child {
-      font-size: 0.72rem;
-      color: #9ca3af;
-    }
-
-    .nav-btn--active {
-      border-color: rgba(56, 189, 248, 0.9);
-      background: linear-gradient(to right, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.24));
-      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.35);
-    }
-
-    .game-panel {
-      margin-top: 4px;
-      padding: 12px 12px 10px;
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-    }
-
-    .game-panel h2 {
-      font-size: 0.98rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .game-panel p {
-      font-size: 0.9rem;
-      color: #e5e7eb;
-      margin-bottom: 8px;
-    }
+    .location-section .subtitle { margin-bottom: var(--space-3); }
+    .location-section .actions { justify-content: flex-start; margin-top: 0; }
 
     .options {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-top: var(--space-2);
     }
-
     .option {
-      border-radius: 14px;
-      border: 2px solid rgba(15, 23, 42, 0.9);
-      padding: 10px 6px;
-      font-size: 0.8rem;
-      background: rgba(15, 23, 42, 0.95);
+      padding: var(--space-3) var(--space-2);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      font-size: var(--text-sm);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: var(--shadow-3d-sm);
+      transition: border-color var(--duration) var(--ease),
+                  background-color var(--duration) var(--ease),
+                  transform var(--duration) var(--ease),
+                  box-shadow var(--duration) var(--ease);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.15s ease;
+      gap: var(--space-2);
       text-align: center;
     }
-
-    .option input {
-      accent-color: #22c55e;
-    }
-
-    .option-swatch {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 2px solid rgba(15, 23, 42, 1);
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6);
-    }
-
     .option:hover {
-      border-color: rgba(96, 165, 250, 0.9);
-      background: rgba(15, 23, 42, 1);
+      border-color: var(--accent);
+      background: var(--bg-elevated);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35), 0 0 0 1px rgba(20,184,166,0.2);
+    }
+    .option input { accent-color: var(--accent); }
+    .option-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
     }
 
-    .color-grid {
-      display: grid;
-      gap: 4px;
-      margin-top: 10px;
-    }
-
+    .color-grid { display: grid; gap: var(--space-1); margin-top: var(--space-3); }
     .color-cell {
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      border: 1px solid rgba(15, 23, 42, 0.9);
-      background: rgba(15, 23, 42, 0.9);
-      position: relative;
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
       cursor: pointer;
-      transition: box-shadow 0.12s ease, transform 0.05s ease;
       touch-action: none;
+      transition: box-shadow var(--duration) var(--ease);
     }
-
     .color-cell--endpoint::after {
       content: "";
       position: absolute;
       inset: 6px;
-      border-radius: 999px;
-      border: 2px solid rgba(15, 23, 42, 0.85);
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7);
+      border-radius: 50%;
+      border: 2px solid rgba(0, 0, 0, 0.25);
     }
-
-    .color-cell--path {
-      box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.5);
-      transform: translateY(-1px);
-    }
+    .color-cell--path { box-shadow: 0 0 0 2px var(--accent); }
 
     .actions {
-      margin-top: 12px;
+      margin-top: var(--space-4);
       display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 8px;
+      gap: var(--space-3);
       align-items: center;
     }
+    .actions--sudoku { margin-top: var(--space-3); }
 
+    /* ===== Buttons ===== */
     button {
+      font-family: inherit;
       border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-base);
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: transform var(--duration) var(--ease),
+                  box-shadow var(--duration) var(--ease),
+                  opacity var(--duration) var(--ease);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-2);
     }
-
     .btn-primary {
-      background: linear-gradient(to right, #22c55e, #10b981);
-      color: #022c22;
-      box-shadow: 0 10px 18px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(180deg, #1dd1c1 0%, var(--accent) 50%, #0d9488 100%);
+      color: #0c0f14;
+      font-weight: 600;
+      border-bottom: 3px solid rgba(0,0,0,0.25);
+      box-shadow:
+        0 4px 0 rgba(0,0,0,0.2),
+        0 6px 20px rgba(20, 184, 166, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.25);
     }
-
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-bottom-width: 4px;
+      box-shadow:
+        0 6px 0 rgba(0,0,0,0.2),
+        0 10px 28px rgba(20, 184, 166, 0.5),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(1px);
+      border-bottom-width: 1px;
+      box-shadow:
+        0 1px 0 rgba(0,0,0,0.25),
+        0 2px 8px rgba(20, 184, 166, 0.3),
+        inset 0 2px 4px rgba(0,0,0,0.2);
+    }
     .btn-primary:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .btn-primary:not(:disabled):hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 26px rgba(16, 185, 129, 0.5);
     }
 
     .status {
-      margin-top: 8px;
-      min-height: 22px;
-      font-size: 0.85rem;
-      color: #9ca3af;
+      margin-top: var(--space-2);
+      min-height: 1.375rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
     }
-
-    .status--error {
-      color: #fecaca;
-    }
-
-    .status--success {
-      color: #bbf7d0;
-    }
+    .status--error { color: var(--error); }
+    .status--success { color: var(--success); }
 
     .location-result {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      /* Sage + lavender theme */
-      background: linear-gradient(135deg, rgba(134, 168, 124, 0.18), rgba(181, 149, 255, 0.14));
-      border: 1px solid rgba(181, 149, 255, 0.55);
-      font-size: 0.85rem;
+      margin-top: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--accent-muted);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      font-size: var(--text-base);
+      box-shadow: var(--shadow-3d-sm), inset 0 1px 0 rgba(255,255,255,0.08);
     }
-
     .location-result a {
-      color: #67e8f9;
+      color: var(--accent-strong);
       text-decoration: none;
       word-break: break-all;
     }
-
-    .location-result a:hover {
-      text-decoration: underline;
-    }
-
+    .location-result a:hover { text-decoration: underline; }
     .copy-btn {
-      background: rgba(15, 23, 42, 0.95);
-      color: #e5e7eb;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.75rem;
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      margin-top: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      border-bottom: 2px solid rgba(0,0,0,0.2);
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-size: var(--text-sm);
       cursor: pointer;
-      margin-top: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transition: border-color var(--duration) var(--ease),
+                  background-color var(--duration) var(--ease),
+                  transform var(--duration) var(--ease),
+                  box-shadow var(--duration) var(--ease);
     }
-
     .copy-btn:hover {
-      border-color: rgba(96, 165, 250, 0.9);
-      background: rgba(15, 23, 42, 1);
+      border-color: var(--accent);
+      background: var(--bg-card);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .copy-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
 
+    /* ===== Sudoku – 3D raised grid (fits fully in view) ===== */
     .sudoku-grid {
       display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 0px;
-      margin-top: 10px;
-      background: #ffffff;
-      border: 2px solid #0b0f19;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .sudoku-cell {
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: repeat(9, minmax(0, 1fr));
+      gap: 0;
+      margin-top: var(--space-3);
       width: 100%;
-      aspect-ratio: 1 / 1;
-      text-align: center;
-      font-size: 0.86rem;
-      background: #ffffff;
-      border: 1px solid #0b0f19;
-      color: #0b0f19;
-      border-radius: 0px;
+      max-width: min(420px, 100%);
+      aspect-ratio: 1;
+      background: #fff;
+      border: 2px solid var(--text);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.15);
     }
-
+    .sudoku-cell {
+      aspect-ratio: 1;
+      min-width: 0;
+      min-height: 0;
+      text-align: center;
+      font-size: clamp(0.65rem, 2.2vw, 0.875rem);
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #0c0f14;
+      border-radius: 0;
+      font-family: inherit;
+    }
     .sudoku-cell:focus {
-      outline: 2px solid #0b0f19;
+      outline: 2px solid var(--accent);
       outline-offset: -2px;
-      background: #f3f4f6;
+      background: #ecfdfa;
     }
-
     .sudoku-cell[disabled] {
-      background: #f9fafb;
-      color: #0b0f19;
-      font-weight: 800;
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #0c0f14;
     }
+    .sudoku-grid .bold-bottom { border-bottom-width: 3px; }
+    .sudoku-grid .bold-right { border-right-width: 3px; }
 
-    .sudoku-grid .bold-bottom {
-      border-bottom-width: 3px;
-    }
-
-    .sudoku-grid .bold-right {
-      border-right-width: 3px;
-    }
-
-    .level-badges {
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-      font-size: 0.72rem;
-      color: #9ca3af;
-    }
-
-    .level-badge {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.6);
-    }
-
-    @media (max-width: 480px) {
-      .app {
-        padding: 16px 14px 14px;
-      }
-
-      .nav {
-        grid-template-columns: 1fr;
-      }
-
-      .options {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-    }
-
+    /* ===== Footer ===== */
     .footer {
-      margin-top: 16px;
+      margin-top: var(--space-6);
       font-size: 0.75rem;
-      color: #6b7280;
+      color: var(--text-muted);
       text-align: center;
+      line-height: var(--leading-normal);
+    }
+
+    /* Utility: screen reader only */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .hero { padding: 2.5rem var(--space-4) 2.5rem; }
+      .app {
+        padding: var(--space-5) var(--space-3) var(--space-4);
+        transform: none;
+      }
+      .app:hover { transform: none; }
+      .nav { flex-direction: column; }
+      .nav-btn { border-bottom: none; border-left: 3px solid transparent; }
+      .nav-btn--active { border-left-color: var(--accent); border-bottom: none; }
+      .options { grid-template-columns: repeat(2, 1fr); }
+      .app__header { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <div class="header">
-      <div>
-        <div class="badge">Brainy Trio</div>
-        <div class="title" style="margin-top: 4px;">Three mini games · One link</div>
+  <div class="app-shell">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">Play · Solve · Reveal</div>
+        <h1 class="hero-title">
+          Brainy Trio
+          <span class="hero-title__highlight">Puzzle Experience</span>
+        </h1>
+        <p class="hero-subtitle">
+          A mini game night in your browser. Sort liquids, crack Sudoku, match Bollywood legends — then reveal your final location name.
+        </p>
+        <div class="hero-cta-row">
+          <button type="button" class="btn-primary" onclick="document.getElementById('game-colors').scrollIntoView({ behavior: 'smooth' });">
+            Start Liquid Sort
+          </button>
+          <div class="hero-pill">
+            <span class="hero-pill-dot" aria-hidden="true"></span>
+            3 games · one final reveal
+          </div>
+        </div>
       </div>
-    </div>
-    <p class="subtitle">
-      Pick a game below. The third game ends by showing your location name (with permission).
-    </p>
+    </section>
 
-    <nav class="nav">
-      <button class="nav-btn nav-btn--active" data-game="colors" id="nav-colors">
-        <span>Liquid Sort</span>
-        <span>3 levels</span>
-      </button>
-      <button class="nav-btn" data-game="sudoku" id="nav-sudoku" style="display:none;">
-        <span>Sudoku</span>
-        <span>1 calm grid</span>
-      </button>
-      <button class="nav-btn" data-game="riddle" id="nav-riddle" style="display:none;">
-        <span>Bollywood Match</span>
-        <span>3 levels · tougher</span>
-      </button>
-    </nav>
+    <main class="app" role="main">
+      <header class="header app__header">
+        <div>
+          <span class="badge">Brainy Trio</span>
+          <h2 class="title app__title">Three mini games · One link</h2>
+        </div>
+      </header>
+      <p class="subtitle">
+        Select a game below. Games auto‑advance; complete all three to see your final location name.
+      </p>
 
-    <section class="game-panel" id="game-colors">
+      <nav class="nav" role="tablist" aria-label="Games">
+        <button type="button" class="nav-btn nav-btn--active" role="tab" aria-selected="true" data-game="colors" id="nav-colors">
+          <span>Liquid Sort</span>
+          <span>3 levels</span>
+        </button>
+        <button type="button" class="nav-btn" role="tab" aria-selected="false" data-game="sudoku" id="nav-sudoku" style="display:none;">
+          <span>Sudoku</span>
+          <span>1 calm grid</span>
+        </button>
+        <button type="button" class="nav-btn" role="tab" aria-selected="false" data-game="riddle" id="nav-riddle" style="display:none;">
+          <span>Bollywood Match</span>
+          <span>3 levels · tougher</span>
+        </button>
+      </nav>
+
+      <section class="game-panel" id="game-colors">
       <h2>Game 1 · Liquid Sort (Water Sort)</h2>
       <p>
         Sort the liquids so each tube contains only one colour. Tap a tube to pick it, then tap another tube to pour.
@@ -402,70 +699,69 @@
       <div class="level-badges">
         <span class="level-badge" id="water-level-indicator">Level 1 of 3</span>
       </div>
-      <div style="margin-top: 10px; font-size: 0.85rem; color:#9ca3af;">
+      <p class="game-panel__rule">
         Rule: you can pour only onto the same top colour (or an empty tube), and only if there is space.
-      </div>
-      <div id="water-tubes" style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px; justify-content:center;"></div>
+      </p>
+      <div id="water-tubes" class="water-tubes-wrap"></div>
       <div class="actions">
         <span id="water-status" class="status"></span>
         <button id="water-undo-btn" class="btn-primary">Undo</button>
         <button id="water-reset-btn" class="btn-primary">Reset level</button>
       </div>
-    </section>
+      </section>
 
-    <section class="game-panel" id="game-sudoku" style="display:none;">
+      <section class="game-panel" id="game-sudoku" style="display:none;">
       <h2>Game 2 · Mini Sudoku</h2>
       <p>
         Fill the grid so each row, column and 3×3 box contains digits 1–9. This is a single curated level.
       </p>
       <div id="sudoku-grid" class="sudoku-grid"></div>
-      <div class="actions" style="margin-top: 10px;">
+      <div class="actions actions--sudoku">
         <span id="sudoku-status" class="status"></span>
         <button id="sudoku-check-btn" class="btn-primary">Check solution</button>
       </div>
-    </section>
+      </section>
 
-    <section class="game-panel" id="game-riddle" style="display:none;">
+      <section class="game-panel" id="game-riddle" style="display:none;">
       <h2>Game 3 · Bollywood Movie Match</h2>
       <p>
         Match each recent movie to its lead actor. Clear all three levels to unlock your location name.
       </p>
 
-      <div style="padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.08); margin-bottom: 8px;">
-        <div style="font-weight: 700; letter-spacing: 0.02em; display:flex; justify-content:space-between; align-items:center;">
+      <div class="bolly-header">
+        <div class="bolly-header__row">
           <span>Recent Bollywood</span>
-          <span id="bolly-level-indicator" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:#fecaca;">Level 1 of 3</span>
+          <span id="bolly-level-indicator" class="bolly-header__indicator">Level 1 of 3</span>
         </div>
-        <div style="margin-top: 4px; color: #e5e7eb; font-size: 0.9rem;">
+        <p class="bolly-header__subtitle">
           Choose the correct lead actor for every movie in this level.
-        </div>
+        </p>
       </div>
 
-      <div id="bolly-rows" style="margin-top: 4px;"></div>
+      <div id="bolly-rows" class="bolly-rows"></div>
 
       <div class="actions">
         <span id="riddle-status" class="status"></span>
         <button id="riddle-check-btn" class="btn-primary">Check matches</button>
       </div>
 
-      <section id="location-section" style="display:none; margin-top: 14px;">
-        <p class="subtitle" style="margin-bottom: 10px;">
+        <section id="location-section" class="location-section" style="display:none;">
+          <p class="subtitle">
           With your permission, we’ll read your current location and show the location name (city/area).
         </p>
-        <div class="actions" style="justify-content: flex-start; margin-top: 0;">
-          <button id="locate-btn" class="btn-primary">
-            <span>Get my location</span>
-          </button>
-          <span id="location-status" class="status"></span>
-        </div>
-        <div id="location-output" class="location-result" style="display:none;"></div>
+          <div class="actions">
+            <button type="button" id="locate-btn" class="btn-primary">Get my location</button>
+            <span id="location-status" class="status"></span>
+          </div>
+          <div id="location-output" class="location-result" style="display:none;"></div>
+        </section>
       </section>
-    </section>
 
-    <div class="footer">
-      After you complete all three games, you can reveal your location name (city/area). Location uses the browser Geolocation API.
-    </div>
-  </main>
+      <div class="footer">
+        After you complete all three games, you can reveal your location name (city/area). Location uses the browser Geolocation API.
+      </div>
+    </main>
+  </div>
 
   <script>
     (function () {
@@ -614,6 +910,7 @@
         tubes.forEach((tube, idx) => {
           const tubeEl = document.createElement("button");
           tubeEl.type = "button";
+          tubeEl.className = "water-tube";
           tubeEl.style.width = "70px";
           tubeEl.style.height = "190px";
           tubeEl.style.padding = "10px 6px 12px";
@@ -624,7 +921,6 @@
               : "3px solid rgba(248, 250, 252, 0.8)";
           tubeEl.style.background =
             "rgba(15, 23, 42, 0.4)";
-          tubeEl.style.boxShadow = "0 0 10px rgba(15,23,42,0.85)";
           // Inner glass area
           const inner = document.createElement("div");
           inner.style.flex = "1";
@@ -850,7 +1146,7 @@
             { title: "Sholay (1975)", correct: "amitabh" },
             { title: "Dilwale Dulhania Le Jayenge (1995)", correct: "srk" },
             { title: "Lagaan (2001)", correct: "aamir" },
-            { title: "3 Idiots (2009)", correct: "aamir" },
+            { title: "Jajantaram Mamataram(2003)", correct: "jaaved" },
           ],
           options: [
             { value: "amitabh", label: "Amitabh Bachchan" },
@@ -858,7 +1154,7 @@
             { value: "srk", label: "Shah Rukh Khan" },
             { value: "aamir", label: "Aamir Khan" },
             { value: "salman", label: "Salman Khan" },
-          ],
+            {value: "jaaved", label: "Jaaved Jaaferi"}          ],
         },
         // Level 2 – 90s / 2000s with overlapping stars
         {
@@ -879,7 +1175,7 @@
         // Level 3 – more recent + critically acclaimed, harder to guess
         {
           movies: [
-            { title: "Kahaani (2012)", correct: "vidya" },
+            { title: "Mission Mangal(2009)", correct: "vidya" },
             { title: "Masaan (2015)", correct: "vicky" },
             { title: "Andhadhun (2018)", correct: "ayushmann" },
             { title: "Haider (2014)", correct: "shahid" },
@@ -890,6 +1186,7 @@
             { value: "ayushmann", label: "Ayushmann Khurrana" },
             { value: "rajkummar", label: "Rajkummar Rao" },
             { value: "shahid", label: "Shahid Kapoor" },
+            { value: "akshay", label: "Akshay Kumar"}
           ],
         },
       ];
@@ -1078,3 +1375,4 @@
   </script>
 </body>
 </html>
+
