@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -329,25 +329,46 @@
       justify-content: center;
     }
     .water-tube {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       box-shadow:
         0 6px 0 rgba(0,0,0,0.25),
         0 8px 24px rgba(0,0,0,0.4),
         inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      border: 3px solid rgba(248, 250, 252, 0.75);
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
     }
-    .water-tube:hover {
+    .water-tube:hover:not(.water-tube--selected) {
       transform: translateY(-3px);
       box-shadow:
         0 9px 0 rgba(0,0,0,0.2),
         0 12px 28px rgba(0,0,0,0.45),
         inset 0 1px 0 rgba(255,255,255,0.1);
     }
-    .water-tube:active {
+    .water-tube:active:not(.water-tube--selected) {
       transform: translateY(2px);
       box-shadow:
         0 2px 0 rgba(0,0,0,0.3),
         0 4px 12px rgba(0,0,0,0.35),
         inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    /* Selected tube – very obvious + pulse ring */
+    .water-tube--selected {
+      transform: translateY(-4px) scale(1.06);
+      border-color: #2dd4bf !important;
+      box-shadow:
+        0 0 0 4px rgba(20, 184, 166, 0.45),
+        0 0 28px rgba(20, 184, 166, 0.55),
+        0 8px 0 rgba(0,0,0,0.2),
+        0 12px 32px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      animation: water-tube-pulse 1.1s ease-in-out infinite;
+      z-index: 2;
+    }
+    @keyframes water-tube-pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.45), 0 0 28px rgba(20, 184, 166, 0.55), 0 8px 0 rgba(0,0,0,0.2), 0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+      50% { box-shadow: 0 0 0 6px rgba(45, 212, 191, 0.5), 0 0 36px rgba(20, 184, 166, 0.65), 0 8px 0 rgba(0,0,0,0.2), 0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.25); }
     }
     .level-badges { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
     .level-badge {
@@ -387,6 +408,68 @@
       font-size: var(--text-base);
     }
     .bolly-rows { margin-top: var(--space-1); }
+
+    /* Bollywood grid – fixed column ratio, aligned rows */
+    .bolly-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-3) var(--space-4);
+      align-items: start;
+      width: 100%;
+    }
+    .bolly-grid__head {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .bolly-movie {
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      background: rgba(20, 184, 166, 0.1);
+      border: 1px solid rgba(20, 184, 166, 0.35);
+      color: var(--text);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      word-break: break-word;
+      min-height: 2.75rem;
+      display: flex;
+      align-items: center;
+    }
+    .bolly-select-wrap {
+      min-width: 0;
+      width: 100%;
+    }
+    .bolly-select {
+      width: 100%;
+      max-width: 100%;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.875rem;
+      cursor: pointer;
+      appearance: auto;
+    }
+    .bolly-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.35);
+    }
+    @media (max-width: 520px) {
+      .bolly-grid {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+        gap: var(--space-2) var(--space-3);
+      }
+      .bolly-movie { font-size: 0.8125rem; padding: var(--space-2); min-height: auto; }
+      .bolly-select { padding: var(--space-2); font-size: 0.8125rem; }
+    }
 
     /* Location section */
     .location-section {
@@ -747,10 +830,10 @@
 
         <section id="location-section" class="location-section" style="display:none;">
           <p class="subtitle">
-          With your permission, we’ll read your current location and show the location name (city/area).
+          Tap below to reveal the venue name and a link to open it in Google Maps.
         </p>
           <div class="actions">
-            <button type="button" id="locate-btn" class="btn-primary">Get my location</button>
+            <button type="button" id="locate-btn" class="btn-primary">Reveal location</button>
             <span id="location-status" class="status"></span>
           </div>
           <div id="location-output" class="location-result" style="display:none;"></div>
@@ -758,7 +841,7 @@
       </section>
 
       <div class="footer">
-        After you complete all three games, you can reveal your location name (city/area). Location uses the browser Geolocation API.
+        After you complete all three games, you can reveal the venue and open it in Google Maps.
       </div>
     </main>
   </div>
@@ -905,20 +988,61 @@
         });
       }
 
+      /** Short UI sounds (Web Audio – no files). */
+      let waterAudioCtx = null;
+      function playWaterSound(kind) {
+        try {
+          if (!waterAudioCtx) {
+            waterAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (waterAudioCtx.state === "suspended") {
+            waterAudioCtx.resume();
+          }
+          const ctx = waterAudioCtx;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          var freq = 520;
+          var dur = 0.06;
+          if (kind === "select") {
+            freq = 880;
+            dur = 0.07;
+          } else if (kind === "deselect") {
+            freq = 380;
+            dur = 0.06;
+          } else if (kind === "pour") {
+            freq = 640;
+            dur = 0.08;
+          } else if (kind === "error") {
+            freq = 220;
+            dur = 0.12;
+          }
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + dur);
+        } catch (e) {}
+      }
+
       function renderTubes() {
         waterTubesEl.innerHTML = "";
         tubes.forEach((tube, idx) => {
           const tubeEl = document.createElement("button");
           tubeEl.type = "button";
-          tubeEl.className = "water-tube";
+          tubeEl.className =
+            "water-tube" +
+            (idx === selectedTubeIndex ? " water-tube--selected" : "");
+          tubeEl.setAttribute(
+            "aria-pressed",
+            idx === selectedTubeIndex ? "true" : "false"
+          );
           tubeEl.style.width = "70px";
           tubeEl.style.height = "190px";
           tubeEl.style.padding = "10px 6px 12px";
           tubeEl.style.borderRadius = "18px";
-          tubeEl.style.border =
-            idx === selectedTubeIndex
-              ? "3px solid rgba(255, 255, 255, 0.95)"
-              : "3px solid rgba(248, 250, 252, 0.8)";
           tubeEl.style.background =
             "rgba(15, 23, 42, 0.4)";
           // Inner glass area
@@ -958,12 +1082,14 @@
             waterStatusEl.classList.remove("status--error", "status--success");
             if (selectedTubeIndex === null) {
               if (!tubes[idx].length) {
+                playWaterSound("error");
                 waterStatusEl.classList.add("status--error");
                 waterStatusEl.textContent = "Pick a non-empty tube first.";
                 return;
               }
               selectedTubeIndex = idx;
               waterStatusEl.textContent = "Now tap a tube to pour into.";
+              playWaterSound("select");
               renderTubes();
               return;
             }
@@ -971,6 +1097,7 @@
             if (selectedTubeIndex === idx) {
               selectedTubeIndex = null;
               waterStatusEl.textContent = "Selection cleared.";
+              playWaterSound("deselect");
               renderTubes();
               return;
             }
@@ -979,10 +1106,12 @@
             selectedTubeIndex = null;
             renderTubes();
             if (!poured) {
+              playWaterSound("error");
               waterStatusEl.classList.add("status--error");
               waterStatusEl.textContent = "Invalid pour. Try another tube.";
               return;
             }
+            playWaterSound("pour");
 
             if (isSolved()) {
               waterStatusEl.classList.add("status--success");
@@ -1175,7 +1304,7 @@
         // Level 3 – more recent + critically acclaimed, harder to guess
         {
           movies: [
-            { title: "Mission Mangal(2009)", correct: "vidya" },
+            { title: "Mission Mangal (2019)", correct: "vidya" },
             { title: "Masaan (2015)", correct: "vicky" },
             { title: "Andhadhun (2018)", correct: "ayushmann" },
             { title: "Haider (2014)", correct: "shahid" },
@@ -1204,42 +1333,33 @@
 
         bollyRowsEl.innerHTML = "";
         const grid = document.createElement("div");
-        grid.style.display = "grid";
-        grid.style.gridTemplateColumns = "1fr 1fr";
-        grid.style.gap = "10px";
-        grid.style.alignItems = "center";
+        grid.className = "bolly-grid";
 
         const headerMovie = document.createElement("div");
+        headerMovie.className = "bolly-grid__head";
         headerMovie.textContent = "Movie";
-        headerMovie.style.fontWeight = "700";
-        headerMovie.style.color = "#e5e7eb";
         const headerActor = document.createElement("div");
+        headerActor.className = "bolly-grid__head";
         headerActor.textContent = "Lead actor";
-        headerActor.style.fontWeight = "700";
-        headerActor.style.color = "#e5e7eb";
         grid.appendChild(headerMovie);
         grid.appendChild(headerActor);
 
-        level.movies.forEach((movie, idx) => {
+        level.movies.forEach((movie) => {
           const movieDiv = document.createElement("div");
+          movieDiv.className = "bolly-movie";
           movieDiv.textContent = movie.title;
-          movieDiv.style.padding = "10px";
-          movieDiv.style.borderRadius = "12px";
-          movieDiv.style.background = "rgba(59, 130, 246, 0.14)";
-          movieDiv.style.border = "1px solid rgba(59, 130, 246, 0.45)";
+
+          const wrap = document.createElement("div");
+          wrap.className = "bolly-select-wrap";
 
           const select = document.createElement("select");
           select.className = "bolly-select";
           select.dataset.correct = movie.correct;
-          select.style.padding = "10px";
-          select.style.borderRadius = "12px";
-          select.style.border = "1px solid rgba(148,163,184,0.45)";
-          select.style.background = "rgba(15,23,42,0.95)";
-          select.style.color = "#e5e7eb";
+          select.setAttribute("aria-label", "Lead actor for " + movie.title);
 
           const placeholder = document.createElement("option");
           placeholder.value = "";
-          placeholder.textContent = "Choose...";
+          placeholder.textContent = "Choose actor…";
           select.appendChild(placeholder);
 
           level.options.forEach((opt) => {
@@ -1249,8 +1369,9 @@
             select.appendChild(option);
           });
 
+          wrap.appendChild(select);
           grid.appendChild(movieDiv);
-          grid.appendChild(select);
+          grid.appendChild(wrap);
         });
 
         bollyRowsEl.appendChild(grid);
@@ -1337,36 +1458,24 @@
           return;
         }
 
-        // No geolocation required: always reveal fixed location name.
-        const name = "Sage & Lavender, Chennai";
+        // Final reveal: clue (not the location itself).
+        const revealTitle = "Final reveal clue:";
+        const revealClue =
+          "Pehle bilkul blank dikhta hoon,\n" +
+          "Phir rang aate hi famous ho jaata hoon.\n" +
+          "Painter ka favourite playground samajh lo mujhe.";
+        const copyText = revealTitle + "\n" + revealClue;
         locationStatusEl.classList.add("status--success");
-        locationStatusEl.textContent = "Location name revealed.";
+        locationStatusEl.textContent = "Clue revealed.";
 
         locationOutputEl.style.display = "block";
         locationOutputEl.innerHTML =
-          "<div><strong>Your location:</strong></div>" +
-          "<div style='margin-top:4px;'>Sage &amp; Lavender, Chennai</div>";
-
-        const copyBtn = document.createElement("button");
-        copyBtn.textContent = "Copy location name";
-        copyBtn.className = "copy-btn";
-        copyBtn.addEventListener("click", function () {
-          copyToClipboard(name).then(
-            function () {
-              copyBtn.textContent = "Copied!";
-              setTimeout(function () {
-                copyBtn.textContent = "Copy location name";
-              }, 1500);
-            },
-            function () {
-              copyBtn.textContent = "Copy failed";
-              setTimeout(function () {
-                copyBtn.textContent = "Copy location name";
-              }, 2000);
-            }
-          );
-        });
-        locationOutputEl.appendChild(copyBtn);
+          "<div><strong>" +
+          revealTitle +
+          "</strong></div>" +
+          "<pre style='margin-top:10px;white-space:pre-wrap;font-family:inherit;color:inherit;opacity:0.95;line-height:1.6;user-select:none;-webkit-user-select:none;-ms-user-select:none;'>" +
+          revealClue +
+          "</pre>";
       });
 
       // Initialise first Bollywood level
@@ -1375,4 +1484,6 @@
   </script>
 </body>
 </html>
+
+
 
