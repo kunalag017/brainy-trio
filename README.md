@@ -610,6 +610,7 @@
       border: 1px solid rgba(20, 184, 166, 0.25);
       font-size: var(--text-base);
       box-shadow: var(--shadow-3d-sm), inset 0 1px 0 rgba(255,255,255,0.08);
+      color: var(--text, #0c0f14);
     }
     .location-result a {
       color: var(--accent-strong);
@@ -1473,7 +1474,7 @@
           "<div><strong>" +
           revealTitle +
           "</strong></div>" +
-          "<pre style='margin-top:10px;white-space:pre-wrap;font-family:inherit;color:inherit;opacity:0.95;line-height:1.6;user-select:none;-webkit-user-select:none;-ms-user-select:none;'>" +
+          "<pre style='margin-top:10px;white-space:pre-wrap;font-family:inherit;color:var(--text, #0c0f14);opacity:0.95;line-height:1.6;'>" +
           revealClue +
           "</pre>";
       });
@@ -1484,6 +1485,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
